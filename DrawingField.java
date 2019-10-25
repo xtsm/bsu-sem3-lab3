@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class DrawingField {
-  private static final int DEFAULT_BRUSH_SIZE = 5;
+  private static final double DEFAULT_BRUSH_SIZE = 5;
 
   private static final Color DEFAULT_BRUSH_COLOR = Color.BLACK;
   
@@ -60,7 +60,7 @@ public class DrawingField {
     gctx.setLineWidth(DEFAULT_BRUSH_SIZE);
     gctx.setStroke(DEFAULT_BRUSH_COLOR);
     gctx.setLineCap(StrokeLineCap.ROUND);
-    brushCursor = new Circle(DEFAULT_BRUSH_SIZE);
+    brushCursor = new Circle(DEFAULT_BRUSH_SIZE / 2);
     background = new Rectangle();
     background.setFill(DEFAULT_BACKGROUND_COLOR);
 
@@ -100,6 +100,16 @@ public class DrawingField {
     } catch (IOException e) {
       e.printStackTrace();
     }
+  }
+
+  public void setColor(Color color) {
+    brushCursor.setFill(color);
+    canvas.getGraphicsContext2D().setStroke(color);
+  }
+  
+  public void setWidth(double width) {
+    brushCursor.setRadius(width / 2);
+    canvas.getGraphicsContext2D().setLineWidth(width);
   }
 
   private void resize(double w, double h) {

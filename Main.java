@@ -12,7 +12,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Menu;
 import javafx.scene.control.Dialog;
+import javafx.scene.control.Slider;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.CustomMenuItem;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.MenuBar;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -23,11 +26,14 @@ import javafx.event.EventHandler;
 import javafx.event.EventTarget;
 import javafx.scene.input.MouseEvent;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.scene.text.Text;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Pos;
 import javafx.scene.layout.Priority;
 import javafx.beans.binding.Bindings;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Point2D;
 import javax.imageio.ImageIO;
 import java.io.File;
@@ -55,10 +61,29 @@ public class Main extends Application{
     
     VBox box = new VBox();
     MenuBar menu = new MenuBar();
-    
+   
+    ColorPicker colorPicker = new ColorPicker();
+    colorPicker.valueProperty().addListener(new ChangeListener<Color>() {
+      public void changed(ObservableValue<? extends Color> obs, Color oldVal, Color newVal) {
+        currentField.setColor(newVal);
+      }
+    });
+    Slider widthSlider = new Slider(1, 20, 3);
+    widthSlider.valueProperty().addListener(new ChangeListener<Number>() {
+      public void changed(ObservableValue<? extends Number> obs, Number oldVal, Number newVal) {
+        currentField.setWidth(newVal.doubleValue());
+      }
+    });
+    widthSlider.setBlockIncrement(1);
+    widthSlider.setMajorTickUnit(1);
+    widthSlider.setShowTickMarks(true);
+    widthSlider.setShowTickLabels(true);
+
     MenuItem newItem = new MenuItem("New");
     MenuItem loadItem = new MenuItem("Load");
     MenuItem saveItem = new MenuItem("Save");
+    CustomMenuItem colorItem = new CustomMenuItem(colorPicker);
+    CustomMenuItem widthItem = new CustomMenuItem(widthSlider);
     newItem.setOnAction(new EventHandler<ActionEvent>() {
       public void handle(ActionEvent evt) {
         Dialog<Point2D> dialog = new NewImageDialog();
@@ -71,6 +96,8 @@ public class Main extends Application{
         currentField = new DrawingField(size.getX(), size.getY());
         drawingFieldContainer.getChildren().add(currentField.getRoot());
         saveItem.setDisable(false);
+        colorPicker.setDisable(false);
+        widthSlider.setDisable(false);
       }
     });
     loadItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -83,6 +110,8 @@ public class Main extends Application{
         currentField = new DrawingField(file);
         drawingFieldContainer.getChildren().add(currentField.getRoot());
         saveItem.setDisable(false);
+        colorPicker.setDisable(false);
+        widthSlider.setDisable(false);
       }
     });
     saveItem.setOnAction(new EventHandler<ActionEvent>() {
@@ -95,7 +124,11 @@ public class Main extends Application{
       }
     });
     saveItem.setDisable(true);
-    menu.getMenus().addAll(new Menu("File", null, newItem, loadItem, saveItem), new Menu("Color", null), new Menu("Brush size", null));
+    colorPicker.setDisable(true);
+    widthSlider.setDisable(true);
+    colorItem.setHideOnClick(false);
+    widthItem.setHideOnClick(false);
+    menu.getMenus().addAll(new Menu("File", null, newItem, loadItem, saveItem), new Menu("Color", null, colorItem), new Menu("Width", null, widthItem));
 
     VBox.setVgrow(scrollWrapper, Priority.ALWAYS);
     box.getChildren().addAll(menu, scrollWrapper);
