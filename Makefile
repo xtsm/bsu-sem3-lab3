@@ -2,4 +2,4 @@
 
 all:
 	javac -d . *.java
-	java -Xmx256m -Xss256m lab3.Main
+	java -Dprism.order=sw lab3.Main
